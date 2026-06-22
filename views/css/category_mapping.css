@@ -1,0 +1,172 @@
+.aggs-category-tree-panel .panel-body {
+  padding: 10px 12px;
+}
+
+.aggs-category-tree-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.aggs-category-search {
+  position: relative;
+}
+
+.aggs-category-search-input {
+  width: 100%;
+}
+
+.aggs-category-search-menu .aggs-autocomplete-item-path {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.aggs-tree-item.aggs-tree-item-hidden {
+  display: none;
+}
+
+.aggs-tree-item.aggs-tree-item-match > .aggs-tree-row .aggs-tree-label {
+  background: #fff9e6;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.aggs-category-tree-toolbar .btn {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.aggs-category-tree-scroll {
+  max-height: 70vh;
+  overflow: auto;
+  border: 1px solid #dbe6e9;
+  border-radius: 3px;
+  padding: 8px;
+  background: #fff;
+}
+
+.aggs-category-tree,
+.aggs-tree-children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.aggs-tree-children {
+  margin-left: 18px;
+  border-left: 1px dashed #d3d8db;
+  padding-left: 8px;
+}
+
+.aggs-tree-children.aggs-tree-collapsed {
+  display: none;
+}
+
+.aggs-tree-item {
+  margin: 0;
+}
+
+.aggs-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  line-height: 1.3;
+}
+
+.aggs-tree-toggle {
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  color: #555;
+  text-align: center;
+}
+
+.aggs-tree-toggle:hover,
+.aggs-tree-toggle:focus {
+  color: #00aff0;
+  text-decoration: none;
+}
+
+.aggs-tree-toggle-spacer {
+  display: inline-block;
+  width: 22px;
+  min-width: 22px;
+}
+
+.aggs-tree-label {
+  flex: 1;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.aggs-tree-item-selected > .aggs-tree-row .aggs-tree-label {
+  color: #00aff0;
+}
+
+.aggs-autocomplete {
+  position: relative;
+  min-width: 220px;
+}
+
+.aggs-autocomplete-display {
+  width: 100%;
+}
+
+.aggs-autocomplete-menu {
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+  right: 0;
+  top: calc(100% + 2px);
+  max-height: 220px;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #c7d6db;
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.aggs-autocomplete-menu.aggs-hidden {
+  display: none;
+}
+
+.aggs-autocomplete-item {
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.aggs-autocomplete-item:hover,
+.aggs-autocomplete-item.aggs-active {
+  background: #f4fcfd;
+  color: #00aff0;
+}
+
+.aggs-autocomplete-empty {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+.aggs-taxonomy-autocomplete .aggs-autocomplete-item-label {
+  display: block;
+  font-size: 13px;
+}
+
+.aggs-taxonomy-autocomplete .aggs-autocomplete-item-path {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}

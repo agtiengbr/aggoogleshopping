@@ -1,0 +1,6 @@
+# Arquivos ignorados no pacote ZIP gerado por `git archive` (release).
+.github export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+INSTRUCOES.md export-ignore
+scripts/install_and_feed.php export-ignore
