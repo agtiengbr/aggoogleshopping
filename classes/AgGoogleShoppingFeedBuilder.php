@@ -263,7 +263,7 @@ final class AgGoogleShoppingFeedBuilder
             return '';
         }
 
-        return $link->getImageLink($product->link_rewrite, $idImage, ImageType::getFormattedName('large'));
+        return $link->getImageLink($product->link_rewrite, $idImage, $this->getImageTypeName('large'));
     }
 
     /**
@@ -375,5 +375,14 @@ final class AgGoogleShoppingFeedBuilder
         $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
 
         return Tools::substr(trim($text), 0, 5000);
+    }
+
+    private function getImageTypeName($name)
+    {
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            return ImageType::getFormattedName($name);
+        }
+
+        return ImageType::getFormatedName($name);
     }
 }

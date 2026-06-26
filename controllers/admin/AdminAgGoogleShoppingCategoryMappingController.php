@@ -35,7 +35,9 @@ class AdminAgGoogleShoppingCategoryMappingController extends ModuleAdminControll
         parent::setMedia($isNewTheme);
 
         $this->addCSS($this->module->getPathUri() . 'views/css/category_mapping.css');
-        $this->addJS($this->module->getPathUri() . 'views/js/category_mapping.js');
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            $this->addJS($this->module->getPathUri() . 'views/js/category_mapping.js');
+        }
     }
 
     public function postProcess()
@@ -158,30 +160,38 @@ class AdminAgGoogleShoppingCategoryMappingController extends ModuleAdminControll
             ];
         }
 
-        $categoryTree = $this->buildCategoryTree($idLang, $idCategory);
-
-        $this->context->smarty->assign([
-            'aggs_category_tree' => $categoryTree,
-            'aggs_category_search_json' => json_encode(
-                $this->buildCategorySearchIndex($categoryTree),
-                JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
-            ),
+        $smartyVars = [
             'aggs_id_category' => $idCategory,
             'aggs_category_name' => (string) $category->name,
             'aggs_field_rows' => $fieldRows,
             'aggs_attribute_groups' => $this->getAttributeGroupOptions($idLang),
             'aggs_features' => $this->getFeatureOptions($idLang),
-            'aggs_form_action' => $this->context->link->getAdminLink('AdminAgGoogleShoppingCategoryMapping'),
-            'aggs_google_taxonomy_ajax_url' => $this->context->link->getAdminLink('AdminAgGoogleShoppingCategoryMapping', true, [], [
-                'ajax' => 1,
-                'action' => 'searchGoogleTaxonomy',
-            ]),
-            'aggs_module_config_url' => $this->context->link->getAdminLink('AdminModules', true, [], [
+            'aggs_form_action' => $this->buildAdminLink('AdminAgGoogleShoppingCategoryMapping'),
+            'aggs_module_config_url' => $this->buildAdminLink('AdminModules', [
                 'configure' => $this->module->name,
             ]),
-        ]);
+        ];
 
-        $this->setTemplate('category_mapping.tpl');
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            $categoryTree = $this->buildCategoryTree($idLang, $idCategory);
+            $smartyVars['aggs_category_tree'] = $categoryTree;
+            $smartyVars['aggs_category_search_json'] = json_encode(
+                $this->buildCategorySearchIndex($categoryTree),
+                JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
+            );
+            $smartyVars['aggs_google_taxonomy_ajax_url'] = $this->buildAdminLink('AdminAgGoogleShoppingCategoryMapping', [
+                'ajax' => 1,
+                'action' => 'searchGoogleTaxonomy',
+            ]);
+            $this->context->smarty->assign($smartyVars);
+            $this->setTemplate('category_mapping.tpl');
+
+            return;
+        }
+
+        $smartyVars['aggs_category_options'] = $this->getFlatCategoryOptions($idLang, $idCategory);
+        $this->context->smarty->assign($smartyVars);
+        $this->setTemplate('category_mapping_ps16.tpl');
     }
 
     /**
@@ -280,7 +290,7 @@ class AdminAgGoogleShoppingCategoryMappingController extends ModuleAdminControll
             'expanded' => $expanded,
             'has_children' => $children !== [],
             'children' => $children,
-            'url' => $this->context->link->getAdminLink('AdminAgGoogleShoppingCategoryMapping', true, [], [
+            'url' => $this->buildAdminLink('AdminAgGoogleShoppingCategoryMapping', [
                 'id_category' => $idCategory,
             ]),
         ];
@@ -350,8 +360,15 @@ class AdminAgGoogleShoppingCategoryMappingController extends ModuleAdminControll
     {
         $query = trim((string) Tools::getValue('q'));
         $results = $this->taxonomyProvider->search($query, $this->getLanguageIsoCode(), 20);
+        $payload = json_encode(['results' => $results], JSON_UNESCAPED_UNICODE);
 
-        $this->ajaxRender(json_encode(['results' => $results], JSON_UNESCAPED_UNICODE));
+        if (method_exists($this, 'ajaxRender')) {
+            $this->ajaxRender($payload);
+        }
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo $payload;
+        exit;
     }
 
     private function resolveFixedValueLabel(string $googleField, string $fixedValue, string $languageIso): string
@@ -377,8 +394,76 @@ class AdminAgGoogleShoppingCategoryMappingController extends ModuleAdminControll
         return is_object($language) ? (string) $language->iso_code : 'en';
     }
 
-    private function t(string $id, array $parameters = []): string
+    private function buildAdminLink($controller, array $params = [])
     {
-        return $this->translator->trans($id, $parameters, 'Modules.Aggoogleshopping.Admin');
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            return $this->context->link->getAdminLink($controller, true, [], $params);
+        }
+
+        $url = $this->context->link->getAdminLink($controller);
+        foreach ($params as $key => $value) {
+            $url .= '&' . rawurlencode((string) $key) . '=' . rawurlencode((string) $value);
+        }
+
+        return $url;
+    }
+
+    private function t($id, array $parameters = [])
+    {
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            return $this->translator->trans($id, $parameters, 'Modules.Aggoogleshopping.Admin');
+        }
+
+        return $this->module->l($id);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getFlatCategoryOptions($idLang, $selectedId)
+    {
+        $rootCategory = Category::getRootCategory();
+        $nested = Category::getNestedCategories((int) $rootCategory->id, $idLang, true);
+        if (!is_array($nested) || $nested === []) {
+            return [];
+        }
+
+        $rootNode = $nested[(int) $rootCategory->id] ?? reset($nested);
+        if (!is_array($rootNode)) {
+            return [];
+        }
+
+        $options = [];
+        $this->collectFlatCategoryOptions($rootNode, $options, (int) $selectedId, '');
+
+        return $options;
+    }
+
+    /**
+     * @param array<string, mixed> $category
+     * @param array<int, array<string, mixed>> $options
+     */
+    private function collectFlatCategoryOptions(array $category, array &$options, $selectedId, $parentPath)
+    {
+        $idCategory = (int) ($category['id_category'] ?? 0);
+        if ($idCategory <= 0) {
+            return;
+        }
+
+        $name = (string) ($category['name'] ?? '');
+        $path = $parentPath === '' ? $name : $parentPath . ' > ' . $name;
+        $options[] = [
+            'id_category' => $idCategory,
+            'name' => $path,
+            'selected' => $idCategory === $selectedId,
+        ];
+
+        if (!empty($category['children']) && is_array($category['children'])) {
+            foreach (array_values($category['children']) as $child) {
+                if (is_array($child)) {
+                    $this->collectFlatCategoryOptions($child, $options, $selectedId, $path);
+                }
+            }
+        }
     }
 }

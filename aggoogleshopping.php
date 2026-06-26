@@ -21,22 +21,36 @@ class aggoogleshopping extends Module
     {
         $this->name = 'aggoogleshopping';
         $this->tab = 'advertising_marketing';
-        $this->version = '1.1.1';
+        $this->version = '1.2.0';
         $this->author = 'AGTI';
         $this->need_instance = 0;
         $this->bootstrap = true;
-        $this->ps_versions_compliancy = ['min' => '1.7.0.0', 'max' => '9.99.99'];
+        $this->ps_versions_compliancy = ['min' => '1.6.0.0', 'max' => '9.99.99'];
 
         parent::__construct();
 
-        $this->displayName = $this->trans('AG Google Shopping Feed', [], 'Modules.Aggoogleshopping.Admin');
-        $this->description = $this->trans('Gera feed XML Google Shopping (RSS 2.0) com token de segurança e URL para atualização agendada.', [], 'Modules.Aggoogleshopping.Admin');
-        $this->confirmUninstall = $this->trans('Remover feed e configurações?', [], 'Modules.Aggoogleshopping.Admin');
+        $this->displayName = $this->moduleTrans('AG Google Shopping Feed');
+        $this->description = $this->moduleTrans('Gera feed XML Google Shopping (RSS 2.0) com token de segurança e URL para atualização agendada.');
+        $this->confirmUninstall = $this->moduleTrans('Remover feed e configurações?');
     }
 
     public function isUsingNewTranslationSystem()
     {
-        return true;
+        return version_compare(_PS_VERSION_, '1.7.0.0', '>=');
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    private function moduleTrans($string)
+    {
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            return $this->trans($string, [], 'Modules.Aggoogleshopping.Admin');
+        }
+
+        return $this->l($string);
     }
 
     public function install(): bool
@@ -80,21 +94,21 @@ class aggoogleshopping extends Module
 
             Configuration::updateValue(self::CONFIG_SKU_FIELD, $skuField !== '' ? $skuField : 'reference');
 
-            $output .= $this->displayConfirmation($this->trans('Configurações salvas.', [], 'Modules.Aggoogleshopping.Admin'));
+            $output .= $this->displayConfirmation($this->moduleTrans('Configurações salvas.'));
         }
 
         if (Tools::isSubmit('submitAgGoogleShoppingRegenerate')) {
             try {
                 $count = $this->regenerateFeed();
-                $output .= $this->displayConfirmation(sprintf($this->trans('Feed regenerado com %d produtos.', [], 'Modules.Aggoogleshopping.Admin'), $count));
+                $output .= $this->displayConfirmation(sprintf($this->moduleTrans('Feed regenerado com %d produtos.'), $count));
             } catch (Exception $e) {
-                $output .= $this->displayError($this->trans('Erro ao regenerar feed: ', [], 'Modules.Aggoogleshopping.Admin') . $e->getMessage());
+                $output .= $this->displayError($this->moduleTrans('Erro ao regenerar feed: ') . $e->getMessage());
             }
         }
 
         if (Tools::isSubmit('submitAgGoogleShoppingRotateToken')) {
             Configuration::updateValue(self::CONFIG_FEED_TOKEN, $this->generateToken());
-            $output .= $this->displayConfirmation($this->trans('Token rotacionado. Atualize a URL do feed no Google Merchant Center e a URL de atualização agendada (CRON).', [], 'Modules.Aggoogleshopping.Admin'));
+            $output .= $this->displayConfirmation($this->moduleTrans('Token rotacionado. Atualize a URL do feed no Google Merchant Center e a URL de atualização agendada (CRON).'));
         }
 
         return $output . $this->renderSetupGuide() . $this->renderConfigForm() . $this->renderCategoryMappingLink() . $this->renderFeedInfo();
@@ -271,36 +285,52 @@ class aggoogleshopping extends Module
 
     private function renderConfigForm(): string
     {
-        $fieldsForm = [
-            'form' => [
-                'legend' => [
-                    'title' => $this->trans('Configuração', [], 'Modules.Aggoogleshopping.Admin'),
-                    'icon' => 'icon-cogs',
-                ],
-                'input' => [
-                    [
-                        'type' => 'select',
-                        'label' => $this->trans('Campo ID/SKU no feed', [], 'Modules.Aggoogleshopping.Admin'),
-                        'name' => self::CONFIG_SKU_FIELD,
-                        'desc' => $this->trans('Deve coincidir com o identificador de produto (ID) configurado no Google Merchant Center.', [], 'Modules.Aggoogleshopping.Admin'),
-                        'options' => [
-                            'query' => [
-                                ['id' => 'reference', 'name' => $this->trans('Referência (reference)', [], 'Modules.Aggoogleshopping.Admin')],
-                                ['id' => 'ean13', 'name' => $this->trans('EAN-13', [], 'Modules.Aggoogleshopping.Admin')],
-                                ['id' => 'upc', 'name' => $this->trans('UPC', [], 'Modules.Aggoogleshopping.Admin')],
-                                ['id' => 'id', 'name' => $this->trans('ID interno PrestaShop', [], 'Modules.Aggoogleshopping.Admin')],
-                            ],
-                            'id' => 'id',
-                            'name' => 'name',
-                        ],
+        $inputs = [
+            [
+                'type' => 'select',
+                'label' => $this->moduleTrans('Campo ID/SKU no feed'),
+                'name' => self::CONFIG_SKU_FIELD,
+                'desc' => $this->moduleTrans('Deve coincidir com o identificador de produto (ID) configurado no Google Merchant Center.'),
+                'options' => [
+                    'query' => [
+                        ['id' => 'reference', 'name' => $this->moduleTrans('Referência (reference)')],
+                        ['id' => 'ean13', 'name' => $this->moduleTrans('EAN-13')],
+                        ['id' => 'upc', 'name' => $this->moduleTrans('UPC')],
+                        ['id' => 'id', 'name' => $this->moduleTrans('ID interno PrestaShop')],
                     ],
-                ],
-                'submit' => [
-                    'title' => $this->trans('Salvar', [], 'Modules.Aggoogleshopping.Admin'),
-                    'name' => 'submitAgGoogleShoppingConfig',
+                    'id' => 'id',
+                    'name' => 'name',
                 ],
             ],
         ];
+
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            $fieldsForm = [
+                'form' => [
+                    'legend' => [
+                        'title' => $this->moduleTrans('Configuração'),
+                        'icon' => 'icon-cogs',
+                    ],
+                    'input' => $inputs,
+                    'submit' => [
+                        'title' => $this->moduleTrans('Salvar'),
+                        'name' => 'submitAgGoogleShoppingConfig',
+                    ],
+                ],
+            ];
+        } else {
+            $fieldsForm = [
+                'legend' => [
+                    'title' => $this->moduleTrans('Configuração'),
+                    'icon' => 'icon-cogs',
+                ],
+                'input' => $inputs,
+                'submit' => [
+                    'title' => $this->moduleTrans('Salvar'),
+                    'name' => 'submitAgGoogleShoppingConfig',
+                ],
+            ];
+        }
 
         $helper = new HelperForm();
         $helper->show_toolbar = false;
@@ -399,7 +429,11 @@ class aggoogleshopping extends Module
 
     private function renderSetupGuide(): string
     {
-        return $this->fetch('module:aggoogleshopping/views/templates/admin/setup_guide.tpl');
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            return $this->fetch('module:aggoogleshopping/views/templates/admin/setup_guide.tpl');
+        }
+
+        return $this->display(__FILE__, 'views/templates/admin/setup_guide.tpl');
     }
 
     private function renderCategoryMappingLink(): string
@@ -422,10 +456,14 @@ class aggoogleshopping extends Module
         $this->context->smarty->assign([
             'aggs_feed_url' => $feedUrl,
             'aggs_cron_url' => $cronUrl,
-            'aggs_last_generated' => $lastGenerated !== '' ? $lastGenerated : $this->trans('Nunca', [], 'Modules.Aggoogleshopping.Admin'),
+            'aggs_last_generated' => $lastGenerated !== '' ? $lastGenerated : $this->moduleTrans('Nunca'),
             'aggs_token_preview' => substr($token, 0, 8) . '…',
         ]);
 
-        return $this->fetch('module:aggoogleshopping/views/templates/admin/feed_info.tpl');
+        if (version_compare(_PS_VERSION_, '1.7.0.0', '>=')) {
+            return $this->fetch('module:aggoogleshopping/views/templates/admin/feed_info.tpl');
+        }
+
+        return $this->display(__FILE__, 'views/templates/admin/feed_info.tpl');
     }
 }
