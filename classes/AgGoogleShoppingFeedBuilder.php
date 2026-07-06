@@ -278,14 +278,10 @@ final class AgGoogleShoppingFeedBuilder
         }
 
         if (strpos($url, '//') === 0) {
-            return Tools::getShopProtocolSsl() . substr($url, 2);
+            return 'https:' . $url;
         }
 
-        if ($url[0] === '/') {
-            return Tools::getShopDomainSsl(true) . $url;
-        }
-
-        return Tools::getShopProtocolSsl() . $url;
+        return 'https://' . ltrim($url, '/');
     }
 
     /**

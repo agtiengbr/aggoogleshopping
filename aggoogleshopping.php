@@ -21,7 +21,7 @@ class aggoogleshopping extends Module
     {
         $this->name = 'aggoogleshopping';
         $this->tab = 'advertising_marketing';
-        $this->version = '1.2.1';
+        $this->version = '1.2.2';
         $this->author = 'AGTI';
         $this->need_instance = 0;
         $this->bootstrap = true;
