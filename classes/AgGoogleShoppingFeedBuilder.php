@@ -263,7 +263,29 @@ final class AgGoogleShoppingFeedBuilder
             return '';
         }
 
-        return $link->getImageLink($product->link_rewrite, $idImage, $this->getImageTypeName('large'));
+        $path = $link->getImageLink($product->link_rewrite, $idImage, $this->getImageTypeName('large'));
+        if ($path === '') {
+            return '';
+        }
+
+        return $this->ensureAbsoluteUrl($path);
+    }
+
+    private function ensureAbsoluteUrl(string $url): string
+    {
+        if (preg_match('#^https?://#i', $url)) {
+            return $url;
+        }
+
+        if (strpos($url, '//') === 0) {
+            return Tools::getShopProtocolSsl() . substr($url, 2);
+        }
+
+        if ($url[0] === '/') {
+            return Tools::getShopDomainSsl(true) . $url;
+        }
+
+        return Tools::getShopProtocolSsl() . $url;
     }
 
     /**

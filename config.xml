@@ -2,7 +2,7 @@
 <module>
     <name>aggoogleshopping</name>
     <displayName><![CDATA[AG Google Shopping Feed]]></displayName>
-    <version><![CDATA[1.2.0]]></version>
+    <version><![CDATA[1.2.1]]></version>
     <description><![CDATA[Feed XML Google Shopping com token, URL de CRON e mapeamento por categoria.]]></description>
     <author><![CDATA[AGTI]]></author>
     <tab><![CDATA[advertising_marketing]]></tab>
