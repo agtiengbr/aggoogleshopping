@@ -63,11 +63,11 @@ aggoogleshopping-1.1.0.zip
     └── …
 ```
 
-O CI monta o arquivo com `git archive`. Apenas arquivos **commitados** entram no pacote.
+O CI monta o arquivo a partir do checkout, executando `composer install --no-dev --optimize-autoloader` quando houver `composer.json`, e publica o ZIP já com os arquivos necessários de runtime (incluindo `vendor/` quando aplicável).
 
 ## O que não vai no ZIP de release
 
-Definido em [`.gitattributes`](.gitattributes) (`export-ignore`):
+Definido pelas exclusões do workflow de release:
 
 - `.github/`
 - `.gitignore`, `.gitattributes`
