@@ -39,10 +39,9 @@ Você vai precisar de:
 
 ### Instalação
 
-1. No painel da loja, vá em **Módulos** → **Gerenciador de módulos**
-2. Clique em **Enviar um módulo** e escolha o arquivo `aggoogleshopping-versão.zip`  
-   *(ou peça à equipe técnica para instalar na pasta de módulos)*
-3. Clique em **Instalar**
+1. Baixe o arquivo `.zip` da [versão mais recente](https://github.com/agtiengbr/aggoogleshopping/releases/latest).
+2. No painel da loja, vá em **Módulos** → **Gerenciador de módulos**
+3. Clique em **Enviar um módulo** e selecione o ZIP baixado. O envio já instala o módulo.
 4. Depois de instalado, clique em **Configurar**
 
 Pronto. A tela de configuração do módulo vai abrir.
@@ -233,10 +232,9 @@ You will need:
 
 ### Installation
 
-1. In the admin, go to **Modules** → **Module Manager**
-2. Click **Upload a module** and select the `aggoogleshopping-version.zip` file  
-   *(or ask your technical team to install it in the modules folder)*
-3. Click **Install**
+1. Download the `.zip` from the [latest release](https://github.com/agtiengbr/aggoogleshopping/releases/latest).
+2. In the admin, go to **Modules** → **Module Manager**
+3. Click **Upload a module** and select the downloaded ZIP. Uploading installs the module.
 4. After installation, click **Configure**
 
 The module settings page will open.
@@ -398,4 +396,4 @@ Contact whoever maintains your store or see [INSTRUCOES.md](INSTRUCOES.md) *(dev
 ## Suporte · Support
 
 - Repositório / Repository: https://github.com/agtiengbr/aggoogleshopping
-- Releases (arquivo ZIP): https://github.com/agtiengbr/aggoogleshopping/releases
+- Release mais recente (arquivo ZIP): https://github.com/agtiengbr/aggoogleshopping/releases/latest
