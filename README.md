@@ -395,5 +395,6 @@ Contact whoever maintains your store or see [INSTRUCOES.md](INSTRUCOES.md) *(dev
 
 ## Suporte · Support
 
+- Página do produto / Product page: https://www.agti.eng.br/13-modulos-para-prestashop
 - Repositório / Repository: https://github.com/agtiengbr/aggoogleshopping
 - Release mais recente (arquivo ZIP): https://github.com/agtiengbr/aggoogleshopping/releases/latest
